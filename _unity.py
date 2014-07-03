@@ -21,9 +21,8 @@ if config.get("aenea.enabled", False) == True:
         Choice
     )
 
-    from proxy_nicknames import Key, Mouse
-    from proxy_actions import communication
-    import aenea
+    from aenea.lax import Key, Mouse
+    import aenea.config
 
     def window_direction(winDirection):
         try:
@@ -94,11 +93,11 @@ if config.get("aenea.enabled", False) == True:
     }
 
     def toggle_host_server():
-        communication.toggle_server()
+        aenea.communications.server.toggle_server()
 
     def switch_to_window(text):
         txt = str(text).lower()
-        communication.server.switch_to_window(txt)
+        aenea.communications.server.server.switch_to_window(txt)
 
     rules = MappingRule(
         mapping={
@@ -148,7 +147,7 @@ if config.get("aenea.enabled", False) == True:
         }
     )
 
-    grammar = Grammar("Unity desktop grammar", context=aenea.global_context)
+    grammar = Grammar("Unity desktop grammar", context=aenea.config.proxy_enable_context)
     grammar.add_rule(rules)
     grammar.load()
 

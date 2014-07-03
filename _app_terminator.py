@@ -12,9 +12,9 @@ from dragonfly import AppContext, Function, Grammar, IntegerRef, Key, MappingRul
 import lib.config
 config = lib.config.get_config()
 if config.get("aenea.enabled", False) == True:
-    from proxy_nicknames import Key  # @Reimport
-    from proxy_nicknames import AppContext as NixAppContext
-    import aenea
+    from aenea import ProxyAppContext as NixAppContext
+    from aenea import ProxyKey as Key
+    import aenea.config
 
 rules = MappingRule(
     mapping = {
@@ -76,7 +76,7 @@ rules = MappingRule(
 
 # This is a Linux-only application, so only enable the grammar if Aenea is enabled.
 if config.get("aenea.enabled", False) == True:
-    context = aenea.global_context & NixAppContext(executable="terminator")
+    context = aenea.config.proxy_enable_context & NixAppContext(executable="terminator")
 
     grammar = Grammar("Terminator general", context=context)
     grammar.add_rule(rules)

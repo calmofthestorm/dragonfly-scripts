@@ -16,7 +16,8 @@ from lib.dynamic_aenea import (
 
 import lib.format
 
-from proxy_nicknames import AppContext as NixAppContext
+from aenea import ProxyAppContext as NixAppContext
+
 
 mapping = {
     # Code execution.

@@ -34,13 +34,15 @@ WORKING_PATH = os.path.split(os.path.dirname(os.path.abspath(__file__)))[0]
 CONFIG_PATH = os.path.join(WORKING_PATH, "config.json")
 CONFIG = {}  # Empty, default config.
 
+GRAMMAR_CONFIG_PATH = os.path.join(WORKING_PATH, "grammars")
+
 
 def save_config():
     global CONFIG
     global CONFIG_PATH
     try:
         configData = json.dumps(CONFIG, sort_keys=True, indent=4,
-            ensure_ascii=False)
+                                ensure_ascii=False)
         with open(CONFIG_PATH, "w+") as f:
             f.write(configData)  # Save config to file.
     except Exception as e:
@@ -53,12 +55,14 @@ def load_config():
     try:
         if os.path.isfile(CONFIG_PATH):  # If the config file exists.
             with open(CONFIG_PATH, "r") as f:
-                CONFIG = json.loads(f.read())  # Load saved configuration.
+                CONFIG = json.load(f)  # Load saved configuration.
                 init_default_values()
         else:  # If the config file does not exist.
             save_config()  # Save the default config to file.
     except Exception as e:
         print("Could not load config file: %s" % str(e))
+
+
 
 
 def init_default_values():
