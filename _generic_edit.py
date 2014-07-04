@@ -25,6 +25,8 @@ from dragonfly import (
     Repetition,
     CompoundRule,
     AppContext,
+    DictList,
+    DictListRef,
 )
 
 from lib.dynamic_aenea import (
@@ -57,6 +59,8 @@ from lib.format import (
     format_text,
     FormatTypes as ft,
 )
+
+import aenea
 
 
 release = Key("shift:up, ctrl:up, alt:up")
@@ -508,9 +512,70 @@ class KeystrokeRule(MappingRule):
         "n": 1,
     }
 
+#-----------------------------------------------------------------------------
+# Vocabulary support
+
+class NumericDelegateRule(CompoundRule):
+    def value(self, node):
+        delegates = node.children[0].children[0].children
+        value = delegates[0].value()
+        if delegates[-1].value() is not None:
+            return value * int(delegates[-1].value())
+        else:
+            return value
+
+
+class StaticCountRule(NumericDelegateRule):
+    spec = '<static> [<n>]'
+
+    extras = [
+        IntegerRef('n', 1, 100),
+        DictListRef(
+            'static',
+            DictList(
+                'static multiedit.count',
+                aenea.vocabulary.get_static_vocabulary('multiedit.count')
+                )),
+        ]
+
+class DynamicCountRule(NumericDelegateRule):
+    spec = '<dynamic> [<n>]'
+
+    extras = [
+        IntegerRef('n', 1, 100),
+        DictListRef('dynamic', aenea.vocabulary.register_dynamic_vocabulary('multiedit.count')),
+        ]
+
+    defaults = {
+        'n': 1,
+        }
+
 
 alternatives = []
 alternatives.append(RuleRef(rule=KeystrokeRule()))
+alternatives.append(
+    DictListRef(
+        'dynamic multiedit',
+        aenea.vocabulary.register_dynamic_vocabulary('multiedit')
+        )
+    )
+alternatives.append(
+    DictListRef(
+        'static multiedit',
+        DictList(
+            'static multiedit',
+            aenea.vocabulary.get_static_vocabulary('multiedit')
+            )
+        )
+    )
+alternatives.append(RuleRef(
+    name='static count rule ref',
+    rule=StaticCountRule(name='static count rule')
+    ))
+alternatives.append(RuleRef(
+    name='dynamic count rule ref',
+    rule=DynamicCountRule(name='dynamic count rule')
+    ))
 single_action = Alternative(alternatives)
 
 
